@@ -18,6 +18,8 @@ public class ProgramTest {
         ConfigEntity.LightningDB lightningDB = config.getLightningdb();
         System.out.println(lightningDB.getDatabase());
         System.out.println(mongodb.getPassword());
+        System.out.println(config.getKafka().getTopic());
+        System.out.println(config.getParameter().isSystemRecovery());
     }
 
     @Test

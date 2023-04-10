@@ -2,19 +2,23 @@ package com.yisa.sink;
 
 import com.yisa.model.FullDocument;
 import com.yisa.utils.ConfigEntity;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Schema;
-import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 public class ClickhouseSink {
     public static void getClickhouseSink(StreamExecutionEnvironment env, ConfigEntity.LightningDB lightningDB, SingleOutputStreamOperator<FullDocument> outputStream) {
         // 创建表环境
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
+        Configuration configuration = tEnv.getConfig().getConfiguration();
+        configuration.setString("pipeline.name", "faceProfileSynchronizing");
+
         tEnv.executeSql(String.format("CREATE TABLE face_profile (\n" +
                         "                `group` DECIMAL,\n" +
                         "                `center` BYTES,\n" +
+                        "                `new_id` BYTES,\n" +
                         "                `group_count` BIGINT,\n" +
                         "                `personnel_name` STRING,\n" +
                         "                `personnel_id_number` STRING,\n" +
@@ -52,13 +56,12 @@ public class ClickhouseSink {
                 lightningDB.getMaxRetries()
         ));
 
-        // 数据流转化为表
-        tEnv.fromDataStream(outputStream);
         // 注册表并使 javaBean 字段名称转化为clickhouse对应表名称
         tEnv.createTemporaryView("outputTable", outputStream,
                 Schema.newBuilder()
                         // .columnByExpression("group", "group")
                         // .columnByExpression("center", "center")
+                        .columnByExpression("new_id", "newId")
                         .columnByExpression("group_count", "groupCount")
                         .columnByExpression("personnel_name", "personnelName")
                         .columnByExpression("personnel_id_number", "personnelIdNumber")
@@ -79,6 +82,7 @@ public class ClickhouseSink {
         tEnv.executeSql("insert into face_profile " +
                 "select `group`, " +
                 "`center`," +
+                "`new_id`," +
                 "`group_count`," +
                 "`personnel_name`," +
                 "`personnel_id_number`," +

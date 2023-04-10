@@ -21,8 +21,8 @@ public class FullDocument {
     @JSONField(deserialize = false)
     private byte[] center;
 
-    // @JSONField(name = "new_id")
-    // private String newId;
+    @JSONField(name = "new_id", deserialize = false)
+    private byte[] newId;
     @JSONField(name = "g_count")
     private int groupCount;
     @JSONField(name = "personnel_name")

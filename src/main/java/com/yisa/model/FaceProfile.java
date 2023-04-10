@@ -36,7 +36,7 @@ public class FaceProfile {
      */
     public void setDeleteTag(long group) {
         fullDocument = new FullDocument();
-        fullDocument.setIsDeleted((byte) -1);
+        fullDocument.setIsDeleted((byte) 1);
         fullDocument.setGroup(group);
     }
 }
