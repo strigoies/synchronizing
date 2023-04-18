@@ -10,7 +10,6 @@ import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDe
 import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.io.IOException;
 
 /**
  * kafkaSource 的key和value的反序列化Schema
@@ -21,7 +20,9 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
     private static final long serialVersionUID = -3168848963265670603L;
 
     @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> consumerRecord, Collector<FaceProfile> collector) throws IOException {
+    public void deserialize(ConsumerRecord<byte[], byte[]> consumerRecord, Collector<FaceProfile> collector) {
+        // key
+        // {"schema":{"type":"struct","fields":[{"type":"string","optional":false,"field":"id"}],"optional":false,"name":"mongo-compact.yisa_oe.face_profile.Key"},"payload":{"id":"1187"}}
         FaceProfile faceProfile = new FaceProfile();
         // 获取group
         faceProfile.setGroup(JSON.parseObject(consumerRecord.key()).getJSONObject("payload").getLong("id"));

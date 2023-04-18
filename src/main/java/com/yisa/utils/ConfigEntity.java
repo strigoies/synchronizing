@@ -14,10 +14,6 @@ import java.io.Serializable;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConfigEntity implements Serializable {
-    /**
-     * mongodb 配置
-     */
-    private MongoDB mongodb;
 
     /**
      * kafka 配置
@@ -33,16 +29,6 @@ public class ConfigEntity implements Serializable {
      */
     private Parameter parameter;
     /* ----------------- 内部设置类 ---------------------- */
-
-    @Data
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class MongoDB implements Serializable {
-        private String hosts;
-        private String database;
-        private String collection;
-        private String username;
-        private String password;
-    }
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -68,7 +54,8 @@ public class ConfigEntity implements Serializable {
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Parameter implements Serializable {
-        private boolean SystemRecovery;
-        private boolean OperatorChain;
+        private boolean disableOperatorChain;
+        private long delayBetweenAttempts;
+        private long checkPoint;
     }
 }

@@ -1,16 +1,7 @@
-mongodb:
-  hosts: 192.168.11.16:30001,192.168.11.16:30002,192.168.11.16:30003
-  # mongo聚类档案数据库
-  database: yisa_oe
-  # mongo聚类档案集合
-  collection: face_profile
-  username: flinkuser
-  password: flinkpw
-
 kafka:
   hosts: 192.168.11.16:9092,192.168.11.17:9092,192.168.11.18:9092
-  # mongo的增量数据
-  topic: mongo16.yisa_oe.face_profile
+  # debezium监控mongo对应topic的数据
+  topic: mongo-compact.yisa_oe.face_profile
   group_id: face-profile-synchronizing-20230401
   # 偏移量策略,earliest,latest
   offset: earliest
@@ -24,7 +15,7 @@ lightningdb:
   # 数据库
   database: test
   # 档案分布式表
-  face_profile_distributed_table: face_profile_all
+  face_profile_distributed_table: face_profile
   # 每一批最大插入的数据量
   batch_size: 10000
   # 刷新间隔期间(毫秒)
@@ -33,8 +24,9 @@ lightningdb:
   max_retries: 3
 
 parameter:
-  # 是否启动系统恢复
-  # 当kafka过期的数据不可消费时，需要设置为true
-  system_recovery: false
+  # 检查点间隔时间(毫秒)
+  check_point: 10000
+  # task级别错误重启 间隔时间
+  delay_between_attempts: 10000
   # 是否禁用算子操作链
-  operator_chain: false
+  disable_operator_chain: false

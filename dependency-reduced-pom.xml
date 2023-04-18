@@ -4,7 +4,7 @@
   <groupId>com.yisa</groupId>
   <artifactId>face-profile-synchronizing</artifactId>
   <name>FaceProfileSynchronizing</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-RELEASE</version>
   <build>
     <pluginManagement>
       <plugins>
@@ -109,6 +109,10 @@
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>commons-lang3</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>commons-math3</artifactId>
           <groupId>org.apache.commons</groupId>
         </exclusion>
@@ -134,6 +138,10 @@
         </exclusion>
         <exclusion>
           <artifactId>flink-scala_2.11</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-guava</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
@@ -234,6 +242,10 @@
         </exclusion>
         <exclusion>
           <artifactId>flink-shaded-jackson</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-guava</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>

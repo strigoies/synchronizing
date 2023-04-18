@@ -30,27 +30,27 @@ public class CommonSchemaTransform {
             // 填充 center 和 centers
             setCenterAndCenters();
         } catch (Exception e) {
-            log.error("解析 中心点失败");
+            log.error("解析 中心点失败, err:{}", e.getMessage());
         }
 
         try {
             // 填充 new_id
             setNewId();
         }catch (Exception e) {
-            log.error("解析 new_id 失败");
+            log.error("解析 new_id 失败, err:{}", e.getMessage());
         }
         try {
             // 填充 high_quality_id
             setHighQualityId();
         }catch (Exception e) {
-            log.error("解析 高质量id失败");
+            log.error("解析 高质量id失败, err:{}", e.getMessage());
         }
 
         try {
             // 填充 source_ids 列表
             setSourceIds();
         }catch (Exception e) {
-            log.error("解析 source_ids 列表失败");
+            log.error("解析 source_ids 列表失败, err:{}", e.getMessage());
         }
 
     }

@@ -1,7 +1,5 @@
 package com.yisa;
 
-import com.alibaba.fastjson2.JSON;
-import com.yisa.model.FaceProfile;
 import com.yisa.utils.ConfigEntity;
 import com.yisa.utils.ReadConfig;
 import org.apache.commons.codec.binary.Base64;
