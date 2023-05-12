@@ -26,6 +26,7 @@ public class ClickhouseSink {
                         "                `cosine_similarity` FLOAT,\n" +
                         "                `special_type` SMALLINT,\n" +
                         "                `associated_time` BIGINT,\n" +
+                        "                `insert_time` BIGINT,\n" +
                         "                `centers` ARRAY<BYTES>,\n" +
                         "                `source_ids` ARRAY<SMALLINT>,\n" +
                         "                `household_code` BIGINT,\n" +
@@ -69,6 +70,7 @@ public class ClickhouseSink {
                         .columnByExpression("cosine_similarity", "cosineSimilarity")
                         .columnByExpression("special_type", "specialType")
                         .columnByExpression("associated_time", "associatedTime")
+                        .columnByExpression("insert_time", "insertTime")
                         // .columnByExpression("centers", "centers")
                         .columnByExpression("source_ids", "sourceIds")
                         .columnByExpression("household_code", "householdCode")
@@ -90,6 +92,7 @@ public class ClickhouseSink {
                 "`cosine_similarity`," +
                 "`special_type`," +
                 "`associated_time`," +
+                "`insert_time`," +
                 "`centers`," +
                 "`source_ids`," +
                 "`household_code`," +

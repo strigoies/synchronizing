@@ -13,16 +13,17 @@ import org.apache.flink.util.Collector;
 @Slf4j
 public class SetDeleteTagAndFilter implements FlatMapFunction<FaceProfile, FullDocument> {
     @Override
-    public void flatMap(FaceProfile faceProfile, Collector<FullDocument> collector) throws Exception {
+    public void flatMap(FaceProfile faceProfile, Collector<FullDocument> collector) {
         try {
             // 设置删除标记
             if (faceProfile.getOperationType().equals("delete") || faceProfile.getOperationType().equals("d")) {
-                faceProfile.setDeleteTag(faceProfile.getGroup());
+                faceProfile.setDeleteTag();
             }
             // 过滤数据
             if (faceProfile.getFullDocument() != null
-                    && faceProfile.getGroup() > 0
-                // && faceProfile.getFullDocument().getNewId() != null
+                    && faceProfile.getFullDocument().getGroup() > 0
+                    // 黑名单数据 不如雷霆
+                    && faceProfile.getFullDocument().getBlackList() != 1
             ){
                 collector.collect(faceProfile.getFullDocument());
             }

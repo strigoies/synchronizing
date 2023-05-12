@@ -1,11 +1,11 @@
 kafka:
   hosts: 192.168.11.16:9092,192.168.11.17:9092,192.168.11.18:9092
   # debezium监控mongo对应topic的数据
-  topic: mongo-compact.yisa_oe.face_profile
+  topic: mongo-shard.yisa_oe.face_group
   group_id: face-profile-synchronizing-20220101
   # 偏移量策略,earliest,latest
   # (同一组id，第一次启动为earliest，后面设置为latest)
-  offset: latest
+  offset: earliest
 
 lightningdb:
   hosts: 192.168.11.16:8123,192.168.11.17:8123,192.168.11.18:8123
@@ -16,7 +16,7 @@ lightningdb:
   # 数据库
   database: yisa_oe
   # 档案分布式表
-  face_profile_distributed_table: face_profile_all
+  face_profile_distributed_table: face_profile_insert_all
   # 每一批最大插入的数据量
   batch_size: 10000
   # 刷新间隔期间(毫秒)
