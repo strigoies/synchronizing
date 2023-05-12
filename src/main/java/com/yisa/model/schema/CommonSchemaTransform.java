@@ -88,7 +88,7 @@ public class CommonSchemaTransform {
 
     private void setNewId() {
         String newIdStr = fullDocumentData.getString("new_id");
-        faceProfile.getFullDocument().setHighQualityId(convertUUIDToBytes(newIdStr));
+        faceProfile.getFullDocument().setNewId(convertUUIDToBytes(newIdStr));
     }
     private void setHighQualityId() {
         String highQualityIdStr = fullDocumentData.getString("high_quality_id");

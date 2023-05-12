@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class FullDocument {
-    @JSONField(name = "_id")
+    @JSONField(name = "_id", deserialize = false)
     private long group;
 
     // private TTamp ttamp;
@@ -37,6 +37,9 @@ public class FullDocument {
     private short specialType;
     @JSONField(name = "associated_time", defaultValue = "0")
     private int associatedTime;
+    @JSONField(deserialize = false)
+    private int insertTime;
+
     // centers
     @JSONField(deserialize = false)
     private byte[][] centers;
@@ -58,8 +61,8 @@ public class FullDocument {
     private byte[] highQualityId;
 
     /* 是否是黑名单（空则不为黑名单）反序列化时判断是否有此属性 */
-    // @JSONField(name = "black_list")
-    // private byte blackList;
+    @JSONField(name = "black_list", defaultValue = "0")
+    private byte blackList;
 
     @JSONField(name = "is_deleted", deserialize = false)
     private short isDeleted;

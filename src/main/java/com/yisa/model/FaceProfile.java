@@ -11,11 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @AllArgsConstructor
 public class FaceProfile {
-    /**
-     * group(与内部类FullDocument的group一致)
-     */
-    @JSONField(serialize = false)
-    private long group;
 
     /**
      * operationType : insert
@@ -34,10 +29,8 @@ public class FaceProfile {
     /**
      * 设置删除的数据
      */
-    public void setDeleteTag(long group) {
-        fullDocument = new FullDocument();
+    public void setDeleteTag() {
         fullDocument.setIsDeleted((byte) 1);
-        fullDocument.setGroup(group);
     }
 }
 

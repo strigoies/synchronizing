@@ -24,23 +24,30 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         // key
         // {"schema":{"type":"struct","fields":[{"type":"string","optional":false,"field":"id"}],"optional":false,"name":"mongo-compact.yisa_oe.face_profile.Key"},"payload":{"id":"1187"}}
         FaceProfile faceProfile = new FaceProfile();
-        // 获取group
-        faceProfile.setGroup(JSON.parseObject(consumerRecord.key()).getJSONObject("payload").getLong("id"));
 
         if (consumerRecord.value() == null) return;
         // 获取操作类型
         JSONObject payload = JSON.parseObject(consumerRecord.value()).getJSONObject("payload");
         faceProfile.setOperationType(payload.getString("op"));
 
+        // 解析数据
         String fullDocumentStr = payload.getString("after");
         faceProfile.setFullDocument(JSON.parseObject(fullDocumentStr, FullDocument.class));
-
-        if (fullDocumentStr != null || faceProfile.getOperationType().equals("d")) {
-            JSONObject fullDocumentData = JSONObject.parseObject(fullDocumentStr);
-            CommonSchemaTransform commonSchemaTransform = new CommonSchemaTransform(fullDocumentData, faceProfile);
-            commonSchemaTransform.parseBytesData();
-            collector.collect(faceProfile);
+        if (faceProfile.getFullDocument() == null && faceProfile.getOperationType().equals("d")) {
+            FullDocument fullDocument = new FullDocument();
+            faceProfile.setFullDocument(fullDocument);
         }
+        // 获取group
+        faceProfile.getFullDocument().setGroup(JSON.parseObject(consumerRecord.key()).getJSONObject("payload").getLong("id"));
+
+        // 获取数据在mongo操作时间
+        // "source":{"version":"2.0.0.Final","connector":"mongodb","name":"mongo-shard","ts_ms":1683861694000,"snapshot":"false","db":"yisa_oe","sequence":null,"rs":"shard01","collection":"face_group","ord":1,"lsid":null,"txnNumber":null}
+        faceProfile.getFullDocument().setInsertTime((int)(payload.getJSONObject("source").getLong("ts_ms")/1000));
+
+        JSONObject fullDocumentData = JSONObject.parseObject(fullDocumentStr);
+        CommonSchemaTransform commonSchemaTransform = new CommonSchemaTransform(fullDocumentData, faceProfile);
+        commonSchemaTransform.parseBytesData();
+        collector.collect(faceProfile);
     }
 
     @Override
