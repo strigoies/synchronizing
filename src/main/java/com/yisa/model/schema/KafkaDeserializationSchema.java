@@ -40,6 +40,18 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         // 获取group
         faceProfile.getFullDocument().setGroup(JSON.parseObject(consumerRecord.key()).getJSONObject("payload").getLong("id"));
 
+        // 获取 associated_time 和 household_code
+        JSONObject after = payload.getJSONObject("after");
+        if (after != null) {
+            if (after.containsKey("associated_time")) {
+                faceProfile.getFullDocument().setAssociatedTime(after.getJSONObject("associated_time").getInteger("$numberLong"));
+            }
+
+            if (after.containsKey("household_code")) {
+                faceProfile.getFullDocument().setHouseholdCode(after.getJSONObject("household_code").getInteger("$numberLong"));
+            }
+        }
+
         // 获取数据在mongo操作时间
         // "source":{"version":"2.0.0.Final","connector":"mongodb","name":"mongo-shard","ts_ms":1683861694000,"snapshot":"false","db":"yisa_oe","sequence":null,"rs":"shard01","collection":"face_group","ord":1,"lsid":null,"txnNumber":null}
         faceProfile.getFullDocument().setInsertTime((int)(payload.getJSONObject("source").getLong("ts_ms")/1000));
