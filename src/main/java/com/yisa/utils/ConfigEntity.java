@@ -1,5 +1,6 @@
 package com.yisa.utils;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -34,7 +35,10 @@ public class ConfigEntity implements Serializable {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Kafka implements Serializable {
         private String hosts;
-        private String topic;
+        private String faceProfileTopic;
+        private String faceProfilePlateTopic;
+        @JSONField(deserialize = false)
+        private String activeTopic;
         private String groupId;
         private String offset;
     }
@@ -47,6 +51,9 @@ public class ConfigEntity implements Serializable {
         private String username;
         private String password;
         private String faceProfileDistributedTable;
+        private String faceProfilePlateDistributedTable;
+        @JSONField(deserialize = false)
+        private String activeTable;
         private int batchSize;
         private int flushInterval;
         private int maxRetries;
@@ -54,6 +61,8 @@ public class ConfigEntity implements Serializable {
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Parameter implements Serializable {
+        @JSONField(deserialize = false)
+        private String jobName;
         private boolean disableOperatorChain;
         private long delayBetweenAttempts;
         private long checkPoint;

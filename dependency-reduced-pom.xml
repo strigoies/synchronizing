@@ -4,7 +4,7 @@
   <groupId>com.yisa</groupId>
   <artifactId>face-profile-synchronizing</artifactId>
   <name>FaceProfileSynchronizing</name>
-  <version>1.0.0-RELEASE</version>
+  <version>1.1.0-beta</version>
   <build>
     <pluginManagement>
       <plugins>
