@@ -25,7 +25,7 @@ public class KafkaSource {
 
         org.apache.flink.connector.kafka.source.KafkaSource<FaceProfile> kafkaSource = org.apache.flink.connector.kafka.source.KafkaSource.<FaceProfile>builder()
                 .setBootstrapServers(kafka.getHosts())
-                .setTopics(kafka.getTopic())
+                .setTopics(kafka.getActiveTopic())
                 .setGroupId(kafka.getGroupId())
                 .setDeserializer(new KafkaDeserializationSchema())
                 .setStartingOffsets(offsetsInitializer)

@@ -6,18 +6,32 @@ import com.yisa.source.KafkaSource;
 import com.yisa.transform.SetDeleteTagAndFilter;
 import com.yisa.utils.ConfigEntity;
 import com.yisa.utils.ReadConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+@Slf4j
 public class FaceProfileSynchronizing {
     public static String[] args;
+    private static final String FACE_PROFILE_JOB = "faceProfileSynchronizing";
+    private static final String FACE_PROFILE_PLATE_JOB = "faceProfilePlateSynchronizing";
 
     public static void main(String[] args) throws Exception {
         FaceProfileSynchronizing.args = args;
-
         // 获取配置文件配置
         ConfigEntity config = ReadConfig.getConfigEntity();
+        // 依据启动的任务 设置消费相应的topic和写入相应的table
+        if (FACE_PROFILE_JOB.equals(config.getParameter().getJobName())) {
+            config.getKafka().setActiveTopic(config.getKafka().getFaceProfileTopic());
+            config.getLightningdb().setActiveTable(config.getLightningdb().getFaceProfileDistributedTable());
+        } else if (FACE_PROFILE_PLATE_JOB.equals(config.getParameter().getJobName())) {
+            config.getKafka().setActiveTopic(config.getKafka().getFaceProfilePlateTopic());
+            config.getLightningdb().setActiveTable(config.getLightningdb().getFaceProfilePlateDistributedTable());
+        } else {
+            log.error("选择了错误的任务去运行!!!");
+            throw new Exception("No change of task");
+        }
 
         /*本地环境调试配置
         Configuration conf = new Configuration();
@@ -42,6 +56,6 @@ public class FaceProfileSynchronizing {
                 .flatMap(new SetDeleteTagAndFilter());
 
         // 数据写入 clickhouse
-        ClickhouseSink.getClickhouseSink(env, config.getLightningdb(), outputStream);
+        ClickhouseSink.getClickhouseSink(env, config.getParameter().getJobName(), config.getLightningdb(), outputStream);
     }
 }

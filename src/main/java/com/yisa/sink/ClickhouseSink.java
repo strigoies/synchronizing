@@ -9,13 +9,13 @@ import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 public class ClickhouseSink {
-    public static void getClickhouseSink(StreamExecutionEnvironment env, ConfigEntity.LightningDB lightningDB, SingleOutputStreamOperator<FullDocument> outputStream) {
+    public static void getClickhouseSink(StreamExecutionEnvironment env, String jobName, ConfigEntity.LightningDB lightningDB, SingleOutputStreamOperator<FullDocument> outputStream) {
         // 创建表环境
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
         Configuration configuration = tEnv.getConfig().getConfiguration();
-        configuration.setString("pipeline.name", "faceProfileSynchronizing");
+        configuration.setString("pipeline.name", jobName);
 
-        tEnv.executeSql(String.format("CREATE TABLE face_profile (\n" +
+        tEnv.executeSql(String.format("CREATE TABLE %s (\n" +
                         "                `group` DECIMAL,\n" +
                         "                `center` BYTES,\n" +
                         "                `new_id` BYTES,\n" +
@@ -47,6 +47,7 @@ public class ClickhouseSink {
                         "                'sink.flush-interval' = '%d',\n" +
                         "                'sink.max-retries' = '%d'\n" +
                         "        )",
+                lightningDB.getActiveTable(),
                 lightningDB.getHosts(),
                 lightningDB.getUsername(),
                 lightningDB.getPassword(),
@@ -81,7 +82,7 @@ public class ClickhouseSink {
                         .columnByExpression("is_deleted", "isDeleted")
                         .build());
         // 插入数据
-        tEnv.executeSql("insert into face_profile " +
+        tEnv.executeSql(String.format("insert into %s " +
                 "select `group`, " +
                 "`center`," +
                 "`new_id`," +
@@ -101,6 +102,6 @@ public class ClickhouseSink {
                 "`gender`," +
                 "`high_quality_id`," +
                 "`is_deleted`" +
-                " from outputTable");
+                " from outputTable", lightningDB.getActiveTable()));
     }
 }

@@ -43,7 +43,7 @@ public class FullDocument {
     // centers
     @JSONField(deserialize = false)
     private byte[][] centers;
-    // sorce_ids
+    // source_ids
     @JSONField(name = "source_ids", deserialize = false)
     private short[] sourceIds;
 
