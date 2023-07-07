@@ -12,12 +12,10 @@ public class ProgramTest {
     public void showConfig(){
         // 获取配置文件配置
         ConfigEntity config = ReadConfig.getConfigEntity();
-        ConfigEntity.MongoDB mongodb = config.getMongodb();
-        ConfigEntity.LightningDB lightningDB = config.getLightningdb();
+        ConfigEntity.LightningDB lightningDB = config.getLightningDB();
         System.out.println(lightningDB.getDatabase());
-        System.out.println(mongodb.getPassword());
-        System.out.println(config.getKafka().getTopic());
-        System.out.println(config.getParameter().isSystemRecovery());
+        System.out.println(config.getKafka().getFaceProfileTopic());
+        System.out.println(config.getParameter().getJobName());
     }
 
     @Test

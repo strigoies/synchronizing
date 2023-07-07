@@ -23,7 +23,7 @@ public class FaceProfile {
     private FullDocument fullDocument;
 
     public FaceProfile() {
-        fullDocument = new FullDocument();
+        fullDocument = FullDocument.create();
     }
 
     /**
