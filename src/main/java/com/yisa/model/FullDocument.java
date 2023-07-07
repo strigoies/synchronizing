@@ -7,23 +7,12 @@ import lombok.Data;
 public class FullDocument {
     @JSONField(name = "_id", deserialize = false)
     private long group;
-
-    // private TTamp ttamp;
-    // @Data
-    // public class TTamp {
-    //     @JSONField(name = "$numberLong")
-    //     private long numberLong;
-    // }
-
-    // private long g;
-    // private int flag;
-    // private long c_count;
     @JSONField(deserialize = false)
     private byte[] center;
 
     @JSONField(name = "new_id", deserialize = false)
     private byte[] newId;
-    @JSONField(name = "g_count")
+    @JSONField(name = "g_count", defaultValue = "0")
     private int groupCount;
     @JSONField(name = "personnel_name")
     private String personnelName;
@@ -33,8 +22,6 @@ public class FullDocument {
     private String personnelPhotoUrl;
     @JSONField(name = "cosine_similarity", defaultValue = "0.0")
     private float cosineSimilarity;
-    @JSONField(name = "special_type", defaultValue = "0")
-    private short specialType;
     @JSONField(name = "associated_time", defaultValue = "0")
     private int associatedTime;
     @JSONField(deserialize = false)
@@ -43,9 +30,9 @@ public class FullDocument {
     // centers
     @JSONField(deserialize = false)
     private byte[][] centers;
-    // source_ids
-    @JSONField(name = "source_ids", deserialize = false)
-    private short[] sourceIds;
+    // source_types
+    @JSONField(deserialize = false)
+    private short[][] sourceTypes;
 
     @JSONField(name = "household_code", defaultValue = "0")
     private int householdCode;
@@ -65,5 +52,31 @@ public class FullDocument {
     private byte blackList;
 
     @JSONField(name = "is_deleted", deserialize = false)
-    private short isDeleted;
+    private byte isDeleted;
+
+    private FullDocument() {
+        this.group = 0;
+        this.center = new byte[0];
+        this.newId = new byte[0];
+        this.groupCount = 0;
+        this.personnelName = "";
+        this.personnelIdNumber = "";
+        this.personnelPhotoUrl = "";
+        this.cosineSimilarity = 0;
+        this.associatedTime = 0;
+        this.insertTime = 0;
+        this.centers = new byte[0][];
+        this.sourceTypes = new short[0][];
+        this.householdCode = 0;
+        this.householdAddress = "";
+        this.birthday = 0;
+        this.gender = 0;
+        this.highQualityId = new byte[0];
+        this.blackList = 0;
+        this.isDeleted = 0;
+    }
+
+    public static FullDocument create() {
+        return new FullDocument();
+    }
 }

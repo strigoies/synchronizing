@@ -1,7 +1,7 @@
 package com.yisa;
 
 import com.yisa.model.FullDocument;
-import com.yisa.sink.ClickhouseSink;
+import com.yisa.sink.LightningDBSink;
 import com.yisa.source.KafkaSource;
 import com.yisa.transform.SetDeleteTagAndFilter;
 import com.yisa.utils.ConfigEntity;
@@ -24,10 +24,10 @@ public class FaceProfileSynchronizing {
         // 依据启动的任务 设置消费相应的topic和写入相应的table
         if (FACE_PROFILE_JOB.equals(config.getParameter().getJobName())) {
             config.getKafka().setActiveTopic(config.getKafka().getFaceProfileTopic());
-            config.getLightningdb().setActiveTable(config.getLightningdb().getFaceProfileDistributedTable());
+            config.getLightningDB().setActiveTable(config.getLightningDB().getFaceProfileDistributedTable());
         } else if (FACE_PROFILE_PLATE_JOB.equals(config.getParameter().getJobName())) {
             config.getKafka().setActiveTopic(config.getKafka().getFaceProfilePlateTopic());
-            config.getLightningdb().setActiveTable(config.getLightningdb().getFaceProfilePlateDistributedTable());
+            config.getLightningDB().setActiveTable(config.getLightningDB().getFaceProfilePlateDistributedTable());
         } else {
             log.error("选择了错误的任务去运行!!!");
             throw new Exception("No change of task");
@@ -53,9 +53,14 @@ public class FaceProfileSynchronizing {
 
         // 获取kafka数据
         SingleOutputStreamOperator<FullDocument> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
-                .flatMap(new SetDeleteTagAndFilter());
+                .flatMap(new SetDeleteTagAndFilter())
+                .name("get data source");
 
         // 数据写入 clickhouse
-        ClickhouseSink.getClickhouseSink(env, config.getParameter().getJobName(), config.getLightningdb(), outputStream);
+        outputStream.keyBy(FullDocument::getGroup)
+                .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
+                .name("insert into clickhouse");
+
+        env.execute(config.getParameter().getJobName());
     }
 }

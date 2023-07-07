@@ -1,19 +1,15 @@
 package com.yisa.utils;
 
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 设置类实体
  */
 @Data
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConfigEntity implements Serializable {
 
     /**
@@ -23,7 +19,7 @@ public class ConfigEntity implements Serializable {
     /**
      * 雷霆配置
      */
-    private LightningDB lightningdb;
+    private LightningDB lightningDB;
 
     /**
      * 程序其他配置
@@ -32,7 +28,6 @@ public class ConfigEntity implements Serializable {
     /* ----------------- 内部设置类 ---------------------- */
 
     @Data
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Kafka implements Serializable {
         private String hosts;
         private String faceProfileTopic;
@@ -44,9 +39,8 @@ public class ConfigEntity implements Serializable {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class LightningDB implements Serializable {
-        private String hosts;
+        private List<List> hosts;
         private String database;
         private String username;
         private String password;
@@ -59,7 +53,6 @@ public class ConfigEntity implements Serializable {
         private int maxRetries;
     }
     @Data
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Parameter implements Serializable {
         @JSONField(deserialize = false)
         private String jobName;

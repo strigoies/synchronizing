@@ -1,13 +1,14 @@
 package com.yisa.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.yisa.FaceProfileSynchronizing;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
+import org.apache.flink.shaded.jackson2.org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Slf4j
 public class ReadConfig {
@@ -17,7 +18,7 @@ public class ReadConfig {
         ConfigEntity configEntity;
         String jobName;
         try {
-            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            Yaml yaml = new Yaml();
             Options options = new Options();
             options.addOption("c", "config", true, "config file path");
             options.addOption("j", "jobName", true, "select job start");
@@ -28,7 +29,8 @@ public class ReadConfig {
                 filePath = cmd.getOptionValue("c");
             }
 
-            configEntity = objectMapper.readValue(new File(filePath), ConfigEntity.class);
+            InputStream inputStream = Files.newInputStream(Paths.get(filePath));
+            configEntity = yaml.loadAs(inputStream, ConfigEntity.class);
 
             // 选择job启动
             if (cmd.hasOption("j")) {

@@ -22,7 +22,7 @@ under the License.
 
 	<groupId>com.yisa</groupId>
 	<artifactId>face-profile-synchronizing</artifactId>
-	<version>1.1.0-beta</version>
+	<version>1.2.0-beta</version>
 	<packaging>jar</packaging>
 
 	<name>FaceProfileSynchronizing</name>
@@ -60,13 +60,28 @@ under the License.
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Add connector dependencies here. They must be in the default scope (compile). -->
+
 		<dependency>
 			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-connector-clickhouse</artifactId>
-			<version>1.14.3-SNAPSHOT</version>
-			<scope>compile</scope>
+			<artifactId>flink-connector-jdbc_${scala.binary.version}</artifactId>
+			<version>${flink.version}</version>
 		</dependency>
+		<dependency>
+			<!-- please stop using ru.yandex.clickhouse as it's been deprecated -->
+			<groupId>com.clickhouse</groupId>
+			<artifactId>clickhouse-jdbc</artifactId>
+			<!--<version>0.3.2-patch11</version>-->
+			<version>0.4.6</version>
+			<!-- use uber jar with all dependencies included, change classifier to http for smaller jar -->
+			<classifier>all</classifier>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
@@ -74,18 +89,6 @@ under the License.
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
-			<version>${flink.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-table-planner_${scala.binary.version}</artifactId>
-			<version>${flink.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
@@ -105,24 +108,6 @@ under the License.
 			<artifactId>fastjson2</artifactId>
 			<version>2.0.26</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.3.1</version>
-		</dependency>
-
 
 		<!-- These dependencies are excluded from the application JAR by default. -->
 		<dependency>
@@ -148,6 +133,12 @@ under the License.
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.16.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -209,32 +200,6 @@ under the License.
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>-->
-<!--				<artifactId>maven-assembly-plugin</artifactId>-->
-<!--				&lt;!&ndash; 可以用 3.2.0  版本 &ndash;&gt;-->
-<!--				<version>3.3.0</version>-->
-<!--				<configuration>-->
-<!--					<descriptorRefs>-->
-<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--					</descriptorRefs>-->
-<!--					<archive>-->
-<!--						<manifest>-->
-<!--							<mainClass>com.yisa.FaceProfileSynchronizing</mainClass>-->
-<!--						</manifest>-->
-<!--					</archive>-->
-<!--				</configuration>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>make-assembly</id>-->
-<!--						&lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
-<!--						<phase>package</phase>-->
-<!--						&lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
-<!--						<goals>-->
-<!--							<goal>single</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
 		</plugins>
 
 		<pluginManagement>
