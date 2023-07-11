@@ -25,7 +25,7 @@ public class FullDocument {
     @JSONField(name = "associated_time", defaultValue = "0")
     private int associatedTime;
     @JSONField(deserialize = false)
-    private int insertTime;
+    private long insertTime;
 
     // centers
     @JSONField(deserialize = false)
