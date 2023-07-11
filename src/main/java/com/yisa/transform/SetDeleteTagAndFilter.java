@@ -16,14 +16,13 @@ public class SetDeleteTagAndFilter implements FlatMapFunction<FaceProfile, FullD
     public void flatMap(FaceProfile faceProfile, Collector<FullDocument> collector) {
         try {
             // 设置删除标记
-            if (faceProfile.getOperationType().equals("delete") || faceProfile.getOperationType().equals("d")) {
+            if (faceProfile.getOperationType().equals("delete") || faceProfile.getOperationType().equals("d")
+            || faceProfile.getFullDocument().getBlackList() == 1 /* 黑名单数据和删除数据设置is_deleted为1 */) {
                 faceProfile.setDeleteTag();
             }
             // 过滤数据
             if (faceProfile.getFullDocument() != null
                     && faceProfile.getFullDocument().getGroup() > 0
-                    // 黑名单数据 不如雷霆
-                    && faceProfile.getFullDocument().getBlackList() != 1
             ){
                 collector.collect(faceProfile.getFullDocument());
             }

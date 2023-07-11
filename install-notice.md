@@ -4,6 +4,10 @@
 
 ## 数据库方面：
 
+重要: 清空表时 要清空 projection
+例如 face_profile
+`ALTER TABLE yisa_oe.face_profile ON CLUSTER distable CLEAR PROJECTION face_profile_projection`
+
 ### face_profile
 
 1. 创建本地表
@@ -21,7 +25,7 @@ create table yisa_oe.face_profile on cluster distable
     `personnel_photo_url` String,
     `cosine_similarity` Float32,
     `associated_time` UInt32,
-    `insert_time` UInt32,
+    `insert_time` UInt64,
     `device_object_types` Array(Tuple(UInt8, UInt8)),
     `centers` Array(String),
     `household_code` UInt32,
@@ -118,7 +122,7 @@ create table yisa_oe.face_profile_plate on cluster distable
     `personnel_photo_url` String,
     `cosine_similarity` Float32,
     `associated_time` UInt32,
-    `insert_time` UInt32,
+    `insert_time` UInt64,
     `device_object_types` Array(Tuple(UInt8, UInt8)),
     `centers` Array(String),
     `household_code` UInt32,

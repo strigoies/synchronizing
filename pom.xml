@@ -22,7 +22,7 @@ under the License.
 
 	<groupId>com.yisa</groupId>
 	<artifactId>face-profile-synchronizing</artifactId>
-	<version>1.2.0-beta</version>
+	<version>1.2.1-beta</version>
 	<packaging>jar</packaging>
 
 	<name>FaceProfileSynchronizing</name>

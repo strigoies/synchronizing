@@ -73,7 +73,10 @@ public class LightningDBSink {
             statement.setString(7, faceProfile.getPersonnelPhotoUrl());
             statement.setFloat(8, faceProfile.getCosineSimilarity());
             statement.setInt(9, faceProfile.getAssociatedTime());
-            statement.setInt(10, faceProfile.getInsertTime());
+            if (faceProfile.getInsertTime() == 0) /* 刪除的数据 设置最新时间戳 */ {
+                faceProfile.setInsertTime(System.currentTimeMillis());
+            }
+            statement.setLong(10, faceProfile.getInsertTime());
 
             Connection conn = statement.getConnection();
             statement.setArray(11, conn.createArrayOf("String", faceProfile.getCenters()));

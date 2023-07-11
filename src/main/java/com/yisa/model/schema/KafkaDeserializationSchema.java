@@ -73,7 +73,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
 
         // 获取数据在mongo操作时间
         if (after.containsKey("ttamp")) {
-            faceProfile.getFullDocument().setInsertTime(after.getJSONObject("ttamp").getInteger("$numberLong"));
+            faceProfile.getFullDocument().setInsertTime(after.getJSONObject("ttamp").getLong("$numberLong"));
         }
 
         if (after.containsKey("associated_time")) {
