@@ -20,7 +20,7 @@ public class LightningDBSink {
     public static String faceProfileInsertSql;
 
     static {
-        faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, personnel_name, personnel_id_number, personnel_photo_url, " +
+        faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, face_count, person_count, personnel_name, personnel_id_number, personnel_photo_url, " +
                 "cosine_similarity, associated_time, insert_time, centers, device_object_types, household_code, household_address, birthday, " +
                 "gender, high_quality_id, is_deleted) " +
                 "VALUES (" + StringUtils.generateMark(19) + ")";
@@ -64,36 +64,39 @@ public class LightningDBSink {
     private static JdbcStatementBuilder<FullDocument> getFaceProfileJdbcStatementBuilder() {
 
         return (statement, faceProfile) -> {
-            statement.setLong(1, faceProfile.getGroup());
-            statement.setBytes(2, faceProfile.getCenter());
-            statement.setBytes(3, faceProfile.getNewId());
-            statement.setInt(4, faceProfile.getGroupCount());
-            statement.setString(5, faceProfile.getPersonnelName());
-            statement.setString(6, faceProfile.getPersonnelIdNumber());
-            statement.setString(7, faceProfile.getPersonnelPhotoUrl());
-            statement.setFloat(8, faceProfile.getCosineSimilarity());
-            statement.setInt(9, faceProfile.getAssociatedTime());
+            int i = 0;
+            statement.setLong(++i, faceProfile.getGroup());
+            statement.setBytes(++i, faceProfile.getCenter());
+            statement.setBytes(++i, faceProfile.getNewId());
+            statement.setInt(++i, faceProfile.getGroupCount());
+            statement.setInt(++i, faceProfile.getFaceCount());
+            statement.setInt(++i, faceProfile.getPersonCount());
+            statement.setString(++i, faceProfile.getPersonnelName());
+            statement.setString(++i, faceProfile.getPersonnelIdNumber());
+            statement.setString(++i, faceProfile.getPersonnelPhotoUrl());
+            statement.setFloat(++i, faceProfile.getCosineSimilarity());
+            statement.setInt(++i, faceProfile.getAssociatedTime());
             if (faceProfile.getInsertTime() == 0) /* 刪除的数据 设置最新时间戳 */ {
                 faceProfile.setInsertTime(System.currentTimeMillis());
             }
-            statement.setLong(10, faceProfile.getInsertTime());
+            statement.setLong(++i, faceProfile.getInsertTime());
 
             Connection conn = statement.getConnection();
-            statement.setArray(11, conn.createArrayOf("String", faceProfile.getCenters()));
+            statement.setArray(++i, conn.createArrayOf("String", faceProfile.getCenters()));
             Object[] objectTuples = new Object[faceProfile.getSourceTypes().length];
-            for (int i = 0; i < faceProfile.getSourceTypes().length; i++) {
-                objectTuples[i] = new Object[] {
-                        faceProfile.getSourceTypes()[i][0],
-                        faceProfile.getSourceTypes()[i][1]
+            for (int j = 0; j < faceProfile.getSourceTypes().length; j++) {
+                objectTuples[j] = new Object[] {
+                        faceProfile.getSourceTypes()[j][0],
+                        faceProfile.getSourceTypes()[j][1]
                 };
             }
-            statement.setArray(12, conn.createArrayOf("Tuple(UInt8, UInt8)", objectTuples));
-            statement.setInt(13, faceProfile.getHouseholdCode());
-            statement.setString(14, faceProfile.getHouseholdAddress());
-            statement.setInt(15, faceProfile.getBirthday());
-            statement.setShort(16, faceProfile.getGender());
-            statement.setBytes(17, faceProfile.getHighQualityId());
-            statement.setByte(18, faceProfile.getIsDeleted());
+            statement.setArray(++i, conn.createArrayOf("Tuple(UInt8, UInt8)", objectTuples));
+            statement.setInt(++i, faceProfile.getHouseholdCode());
+            statement.setString(++i, faceProfile.getHouseholdAddress());
+            statement.setInt(++i, faceProfile.getBirthday());
+            statement.setShort(++i, faceProfile.getGender());
+            statement.setBytes(++i, faceProfile.getHighQualityId());
+            statement.setByte(++i, faceProfile.getIsDeleted());
         };
     }
 }
