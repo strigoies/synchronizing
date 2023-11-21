@@ -49,7 +49,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         // 获取 associated_time 和 household_code
         JSONObject afterObject = JSONObject.parseObject(afterStr);
         // 特殊处理 int 类型数据
-        parseIntegerData(faceProfile, afterObject);
+        parseLongData(faceProfile, afterObject);
 
         CommonSchemaTransform commonSchemaTransform = new CommonSchemaTransform(afterObject, faceProfile);
         commonSchemaTransform.parseBytesData();
@@ -62,11 +62,11 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
     }
 
     /**
-     * 解析 int 类型字段
+     * 解析 long 类型字段
      * @param faceProfile
      * @param after
      */
-    private void parseIntegerData(FaceProfile faceProfile, JSONObject after) {
+    private void parseLongData(FaceProfile faceProfile, JSONObject after) {
         if (after == null) {
             return;
         }

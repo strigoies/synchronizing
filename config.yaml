@@ -1,5 +1,5 @@
 kafka:
-  hosts: 192.168.11.16:9092,192.168.11.17:9092,192.168.11.18:9092
+  hosts: 192.168.11.12:9092,192.168.11.13:9092,192.168.11.14:9092
   # debezium监控mongo对应topic的数据
   faceProfileTopic: mongo-shard.yisa_oe.face_group
   faceProfilePlateTopic: mongo-shard.yisa_oe.face_group_plate
@@ -10,12 +10,12 @@ kafka:
 
 lightningDB:
   hosts:
-    - [ '192.168.11.16', 8123 ]
-    - [ '192.168.11.17', 8123 ]
+    - [ '192.168.11.12', 8123 ]
+    - [ '192.168.11.13', 8123 ]
   # 用户名 默认: default
-  username: default
+  username: bigdata
   # 密码 默认: ''
-  password: wSqDxDAt
+  password: bigdata-fusion3.0
   # 数据库
   database: yisa_oe
   # 档案分布式表

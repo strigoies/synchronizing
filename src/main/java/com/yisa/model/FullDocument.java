@@ -12,8 +12,13 @@ public class FullDocument {
 
     @JSONField(name = "new_id", deserialize = false)
     private byte[] newId;
-    @JSONField(name = "g_count", defaultValue = "0")
+    @JSONField(name = "grout_count", defaultValue = "0")
     private int groupCount;
+    @JSONField(name = "face_count", defaultValue = "0")
+    private int faceCount;
+    @JSONField(name = "person_count", defaultValue = "0")
+    private int personCount;
+
     @JSONField(name = "personnel_name")
     private String personnelName;
     @JSONField(name = "personnel_id_number")
@@ -59,6 +64,8 @@ public class FullDocument {
         this.center = new byte[0];
         this.newId = new byte[0];
         this.groupCount = 0;
+        this.faceCount = 0;
+        this.personCount = 0;
         this.personnelName = "";
         this.personnelIdNumber = "";
         this.personnelPhotoUrl = "";
