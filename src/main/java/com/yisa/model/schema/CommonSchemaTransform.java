@@ -102,6 +102,10 @@ public class CommonSchemaTransform {
 
     private void setSourceTypes() {
         JSONArray sourceTypes = fullDocumentData.getJSONArray(SOURCE_TYPES_NAME);
+        if (sourceTypes == null) {
+            faceProfile.getFullDocument().setSourceTypes(new short[][]{});
+            return;
+        }
         short[][] array = new short[sourceTypes.size()][];
         for (int i = 0; i < sourceTypes.size(); i++) {
             // {"device_type":2,"object_type":6}
