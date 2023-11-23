@@ -37,7 +37,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         String afterStr = payload.getString("after");
         faceProfile.setFullDocument(JSON.parseObject(afterStr, FullDocument.class));
 
-        if (faceProfile.getFullDocument() == null && faceProfile.getOperationType().equals("d")) {
+        if (faceProfile.getFullDocument() == null || faceProfile.getOperationType().equals("d")) {
             // 删除类型数据的处理
             FullDocument fullDocument = FullDocument.create();
             faceProfile.setFullDocument(fullDocument);
@@ -48,7 +48,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
 
         // 获取 associated_time 和 household_code
         JSONObject afterObject = JSONObject.parseObject(afterStr);
-        // 特殊处理 int 类型数据
+        // 特殊处理 long 类型数据
         parseLongData(faceProfile, afterObject);
 
         CommonSchemaTransform commonSchemaTransform = new CommonSchemaTransform(afterObject, faceProfile);
