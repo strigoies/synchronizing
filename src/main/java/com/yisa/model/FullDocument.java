@@ -56,6 +56,12 @@ public class FullDocument {
     @JSONField(name = "black_list", defaultValue = "0")
     private byte blackList;
 
+    /**
+     * fusion3.0 标签
+     */
+    @JSONField(deserialize = false)
+    private Integer[] labels;
+
     @JSONField(name = "is_deleted", deserialize = false)
     private byte isDeleted;
 
@@ -80,6 +86,7 @@ public class FullDocument {
         this.gender = 0;
         this.highQualityId = new byte[0];
         this.blackList = 0;
+        this.labels = new Integer[0];
         this.isDeleted = 0;
     }
 

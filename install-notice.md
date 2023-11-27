@@ -35,6 +35,7 @@ create table yisa_oe.face_profile on cluster distable
     `birthday` UInt32,
     `gender` UInt8,
     `high_quality_id` FixedString(16),
+    `labels` UInt32,
     `is_deleted` Int8,
     PROJECTION face_profile_projection
  (
@@ -56,7 +57,8 @@ create table yisa_oe.face_profile on cluster distable
          argMax(household_address, insert_time) as household_address, 
          argMax(birthday, insert_time) as birthday,  
          argMax(gender, insert_time) as gender,  
-         argMax(high_quality_id, insert_time) as high_quality_id,  
+         argMax(high_quality_id, insert_time) as high_quality_id,
+         argMax(labels, insert_time) as labels,
          argMax(is_deleted, insert_time) as is_deleted 
      GROUP BY group
  )
@@ -98,7 +100,8 @@ CREATE VIEW yisa_oe.face_profile_view_all on cluster distable AS
        argMax(household_address, insert_time) as household_address, 
        argMax(birthday, insert_time) as birthday,  
        argMax(gender, insert_time) as gender,  
-       argMax(high_quality_id, insert_time) as high_quality_id,  
+       argMax(high_quality_id, insert_time) as high_quality_id,
+       argMax(labels, insert_time) as labels,
        argMax(is_deleted, insert_time) as is_deleted 
 FROM face_profile_insert_all
 GROUP BY group
@@ -138,6 +141,7 @@ create table yisa_oe.face_profile_plate on cluster distable
     `birthday` UInt32,
     `gender` UInt8,
     `high_quality_id` FixedString(16),
+    `labels` UInt32,
     `is_deleted` Int8,
     PROJECTION face_profile_plate_projection
  (
@@ -159,7 +163,8 @@ create table yisa_oe.face_profile_plate on cluster distable
          argMax(household_address, insert_time) as household_address, 
          argMax(birthday, insert_time) as birthday,  
          argMax(gender, insert_time) as gender,  
-         argMax(high_quality_id, insert_time) as high_quality_id,  
+         argMax(high_quality_id, insert_time) as high_quality_id,
+         argMax(labels, insert_time) as labels,
          argMax(is_deleted, insert_time) as is_deleted 
      GROUP BY group
  )
@@ -201,7 +206,8 @@ CREATE VIEW yisa_oe.face_profile_plate_view_all on cluster distable AS
        argMax(household_address, insert_time) as household_address, 
        argMax(birthday, insert_time) as birthday,  
        argMax(gender, insert_time) as gender,  
-       argMax(high_quality_id, insert_time) as high_quality_id,  
+       argMax(high_quality_id, insert_time) as high_quality_id,
+       argMax(labels, insert_time) as labels,
        argMax(is_deleted, insert_time) as is_deleted 
 FROM face_profile_plate_insert_all
 GROUP BY group

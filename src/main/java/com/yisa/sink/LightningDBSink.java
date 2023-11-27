@@ -22,7 +22,7 @@ public class LightningDBSink {
     static {
         faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, face_count, person_count, personnel_name, personnel_id_number, personnel_photo_url, " +
                 "cosine_similarity, associated_time, insert_time, centers, device_object_types, household_code, household_address, birthday, " +
-                "gender, high_quality_id, is_deleted) " +
+                "gender, high_quality_id, labels, is_deleted) " +
                 "VALUES (" + StringUtils.generateMark(19) + ")";
     }
 
@@ -96,6 +96,7 @@ public class LightningDBSink {
             statement.setInt(++i, faceProfile.getBirthday());
             statement.setShort(++i, faceProfile.getGender());
             statement.setBytes(++i, faceProfile.getHighQualityId());
+            statement.setArray(++i, conn.createArrayOf("UInt32", faceProfile.getLabels()));
             statement.setByte(++i, faceProfile.getIsDeleted());
         };
     }
