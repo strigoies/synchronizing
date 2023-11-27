@@ -1,6 +1,5 @@
 package com.yisa.model.schema;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.yisa.model.FaceProfile;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Data

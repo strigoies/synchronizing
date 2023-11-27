@@ -2,7 +2,6 @@ package com.yisa.model.schema;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONReader;
 import com.yisa.model.FaceProfile;
 import com.yisa.model.FullDocument;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +9,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
 import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
-import java.util.Arrays;
 
 
 /**
