@@ -57,6 +57,11 @@ public class CommonSchemaTransform {
             log.error("解析 source_types 列表失败, err:{}", e.getMessage());
         }
 
+        try {
+            setLabels();
+        }catch (Exception e) {
+            log.error("解析标签 labels 失败, err:{}", e.getMessage());
+        }
     }
     /**
      * 判断该组是否为黑名单数据
@@ -113,6 +118,13 @@ public class CommonSchemaTransform {
             array[i] = new short[]{jsonObject.getShort(DEVICE_TYPE_NAME), jsonObject.getShort(OBJECT_TYPE_NAME)};
         }
         faceProfile.getFullDocument().setSourceTypes(array);
+    }
+
+    private void setLabels() {
+        JSONArray labels = fullDocumentData.getJSONArray("labels");
+        if (labels != null) {
+            faceProfile.getFullDocument().setLabels(labels.toArray(Integer.class));
+        }
     }
 
     private static byte[] convertUUIDToBytes(String uuidStr) {

@@ -6,7 +6,7 @@ kafka:
   groupId: face-profile-synchronizing-20220101
   # 偏移量策略,earliest,latest
   # (同一组id，第一次启动为earliest，后面设置为latest)
-  offset: earliest
+  offset: latest
 
 lightningDB:
   hosts:
