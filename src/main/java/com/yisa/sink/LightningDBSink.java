@@ -10,8 +10,6 @@ import org.apache.flink.connector.jdbc.JdbcStatementBuilder;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -23,7 +21,7 @@ public class LightningDBSink {
         faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, face_count, person_count, personnel_name, personnel_id_number, personnel_photo_url, " +
                 "cosine_similarity, associated_time, insert_time, centers, device_object_types, household_code, household_address, birthday, " +
                 "gender, high_quality_id, labels, is_deleted) " +
-                "VALUES (" + StringUtils.generateMark(19) + ")";
+                "VALUES (" + StringUtils.generateMark(20) + ")";
     }
 
     /**
