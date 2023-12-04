@@ -18,6 +18,8 @@ public class FullDocument {
     private int faceCount;
     @JSONField(name = "person_count", defaultValue = "0")
     private int personCount;
+    @JSONField(name = "age_id",defaultValue = "0")
+    private short ageId;
 
     @JSONField(name = "personnel_name")
     private String personnelName;
@@ -71,6 +73,7 @@ public class FullDocument {
         this.newId = new byte[0];
         this.groupCount = 0;
         this.faceCount = 0;
+        this.ageId = 0;
         this.personCount = 0;
         this.personnelName = "";
         this.personnelIdNumber = "";

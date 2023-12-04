@@ -18,10 +18,10 @@ public class LightningDBSink {
     public static String faceProfileInsertSql;
 
     static {
-        faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, face_count, person_count, personnel_name, personnel_id_number, personnel_photo_url, " +
+        faceProfileInsertSql = "INSERT INTO %s (group, center, new_id, group_count, face_count, person_count, age_id,personnel_name, personnel_id_number, personnel_photo_url, " +
                 "cosine_similarity, associated_time, insert_time, centers, device_object_types, household_code, household_address, birthday, " +
                 "gender, high_quality_id, labels, is_deleted) " +
-                "VALUES (" + StringUtils.generateMark(20) + ")";
+                "VALUES (" + StringUtils.generateMark(21) + ")";
     }
 
     /**
@@ -69,6 +69,7 @@ public class LightningDBSink {
             statement.setInt(++i, faceProfile.getGroupCount());
             statement.setInt(++i, faceProfile.getFaceCount());
             statement.setInt(++i, faceProfile.getPersonCount());
+            statement.setInt(++i, faceProfile.getAgeId());
             statement.setString(++i, faceProfile.getPersonnelName());
             statement.setString(++i, faceProfile.getPersonnelIdNumber());
             statement.setString(++i, faceProfile.getPersonnelPhotoUrl());
