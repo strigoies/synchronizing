@@ -3,7 +3,7 @@ kafka:
   # debezium监控mongo对应topic的数据
   faceProfileTopic: mongo-shard.yisa_oe.face_group
   faceProfilePlateTopic: mongo-shard.yisa_oe.face_group_plate
-  groupId: face-profile-synchronizing-20220101
+  groupId: face-profile-synchronizing-20221206
   # 偏移量策略,earliest,latest
   # (同一组id，第一次启动为earliest，后面设置为latest)
   offset: latest

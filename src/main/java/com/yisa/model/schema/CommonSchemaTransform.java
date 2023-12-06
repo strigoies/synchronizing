@@ -86,27 +86,27 @@ public class CommonSchemaTransform {
                 continue;
             }
             if (i == 0) {
-                faceProfile.getFullDocument().setCenter(centerBytes);
+                faceProfile.setCenter(centerBytes);
             }
             bytesList.add(centerBytes);
         }
 
-        faceProfile.getFullDocument().setCenters(bytesList.toArray(new byte[bytesList.size()][]));
+        faceProfile.setCenters(bytesList.toArray(new byte[bytesList.size()][]));
     }
 
     private void setNewId() {
         String newIdStr = fullDocumentData.getString("new_id");
-        faceProfile.getFullDocument().setNewId(convertUUIDToBytes(newIdStr));
+        faceProfile.setNewId(convertUUIDToBytes(newIdStr));
     }
     private void setHighQualityId() {
         String highQualityIdStr = fullDocumentData.getString("high_quality_id");
-        faceProfile.getFullDocument().setHighQualityId(convertUUIDToBytes(highQualityIdStr));
+        faceProfile.setHighQualityId(convertUUIDToBytes(highQualityIdStr));
     }
 
     private void setSourceTypes() {
         JSONArray sourceTypes = fullDocumentData.getJSONArray(SOURCE_TYPES_NAME);
         if (sourceTypes == null) {
-            faceProfile.getFullDocument().setSourceTypes(new short[][]{});
+            faceProfile.setSourceTypes(new short[][]{});
             return;
         }
         short[][] array = new short[sourceTypes.size()][];
@@ -115,13 +115,13 @@ public class CommonSchemaTransform {
             JSONObject jsonObject = JSONObject.parseObject(sourceTypes.get(i).toString());
             array[i] = new short[]{jsonObject.getShort(DEVICE_TYPE_NAME), jsonObject.getShort(OBJECT_TYPE_NAME)};
         }
-        faceProfile.getFullDocument().setSourceTypes(array);
+        faceProfile.setSourceTypes(array);
     }
 
     private void setLabels() {
         JSONArray labels = fullDocumentData.getJSONArray("labels");
         if (labels != null) {
-            faceProfile.getFullDocument().setLabels(labels.toArray(Integer.class));
+            faceProfile.setLabels(labels.toArray(Integer.class));
         }
     }
 

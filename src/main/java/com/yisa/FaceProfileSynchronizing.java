@@ -1,13 +1,14 @@
 package com.yisa;
 
-import com.yisa.model.FullDocument;
+import com.yisa.model.BaseData;
+import com.yisa.model.FaceProfile;
 import com.yisa.sink.LightningDBSink;
 import com.yisa.source.KafkaSource;
-import com.yisa.transform.SetDeleteTagAndFilter;
 import com.yisa.utils.ConfigEntity;
 import com.yisa.utils.ReadConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -52,12 +53,14 @@ public class FaceProfileSynchronizing {
         }
 
         // 获取kafka数据
-        SingleOutputStreamOperator<FullDocument> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
-                .flatMap(new SetDeleteTagAndFilter())
+        SingleOutputStreamOperator<BaseData> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
                 .name("get data source");
 
         // 数据写入 clickhouse
-        outputStream.keyBy(FullDocument::getGroup)
+        outputStream.keyBy((KeySelector<BaseData, Long>) value -> {
+            FaceProfile val = (FaceProfile)value;
+            return val.getGroup();
+        })
                 .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
                 .name("insert into clickhouse");
 
