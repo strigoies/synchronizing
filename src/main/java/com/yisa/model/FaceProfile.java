@@ -14,7 +14,7 @@ public class FaceProfile extends BaseData {
 
     @JSONField(name = "new_id", deserialize = false)
     private byte[] newId = new byte[0];
-    @JSONField(name = "grout_count", defaultValue = "0")
+    @JSONField(alternateNames = {"g_count", "group_count"}, defaultValue = "0")
     private int groupCount;
     @JSONField(name = "face_count", defaultValue = "0")
     private int faceCount;
@@ -24,11 +24,11 @@ public class FaceProfile extends BaseData {
     private short ageId;
 
     @JSONField(name = "personnel_name")
-    private String personnelName;
+    private String personnelName = "";
     @JSONField(name = "personnel_id_number")
-    private String personnelIdNumber;
+    private String personnelIdNumber = "";
     @JSONField(name = "personnel_photo_url")
-    private String personnelPhotoUrl;
+    private String personnelPhotoUrl = "";
     @JSONField(name = "cosine_similarity", defaultValue = "0.0")
     private float cosineSimilarity;
     @JSONField(name = "associated_time", defaultValue = "0")
@@ -46,7 +46,7 @@ public class FaceProfile extends BaseData {
     @JSONField(name = "household_code", defaultValue = "0")
     private int householdCode;
     @JSONField(name = "household_address")
-    private String householdAddress;
+    private String householdAddress = "";
 
     @JSONField(defaultValue = "0")
     private int birthday;
