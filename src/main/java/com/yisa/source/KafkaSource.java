@@ -1,6 +1,6 @@
 package com.yisa.source;
 
-import com.yisa.model.BaseData;
+import com.yisa.model.FaceProfile;
 import com.yisa.model.schema.KafkaDeserializationSchema;
 import com.yisa.utils.ConfigEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 @Slf4j
 public class KafkaSource {
-    public static SingleOutputStreamOperator<BaseData> getKafkaStream(StreamExecutionEnvironment env, ConfigEntity.Kafka kafka) {
+    public static SingleOutputStreamOperator<FaceProfile> getKafkaStream(StreamExecutionEnvironment env, ConfigEntity.Kafka kafka) {
         String offsetReset = kafka.getOffset();
         OffsetsInitializer offsetsInitializer = OffsetsInitializer.latest();
         if (offsetReset.equals("earliest")) {
@@ -23,7 +23,7 @@ public class KafkaSource {
             log.error("kafkaSource 设置开始消费的偏移量错误");
         }
 
-        org.apache.flink.connector.kafka.source.KafkaSource<BaseData> kafkaSource = org.apache.flink.connector.kafka.source.KafkaSource.<BaseData>builder()
+        org.apache.flink.connector.kafka.source.KafkaSource<FaceProfile> kafkaSource = org.apache.flink.connector.kafka.source.KafkaSource.<FaceProfile>builder()
                 .setBootstrapServers(kafka.getHosts())
                 .setTopics(kafka.getActiveTopic())
                 .setGroupId(kafka.getGroupId())
@@ -32,7 +32,7 @@ public class KafkaSource {
                 .setProperty("enable.auto.commit", "true")
                 .build();
 
-        WatermarkStrategy<BaseData> strategy = WatermarkStrategy.noWatermarks();
-        return env.fromSource(kafkaSource, strategy, "kafkaSource").returns(TypeInformation.of(BaseData.class));
+        WatermarkStrategy<FaceProfile> strategy = WatermarkStrategy.noWatermarks();
+        return env.fromSource(kafkaSource, strategy, "kafkaSource").returns(TypeInformation.of(FaceProfile.class));
     }
 }

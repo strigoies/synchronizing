@@ -22,6 +22,11 @@ public class ConfigEntity implements Serializable {
     private LightningDB lightningDB;
 
     /**
+    *  ArangoDB配置
+    * */
+    private ArangoDB arangoDB;
+
+    /**
      * 程序其他配置
      */
     private Parameter parameter;
@@ -59,5 +64,20 @@ public class ConfigEntity implements Serializable {
         private boolean disableOperatorChain;
         private long delayBetweenAttempts;
         private long checkPoint;
+    }
+
+    @Data
+    public static class ArangoDB implements Serializable{
+        private List<List> hosts;
+        private String database;
+        private String username;
+        private String password;
+        private String faceProfileTable;
+        private String faceProfilePlateTable;
+        private String relationEdgeTable;
+        @JSONField(deserialize = false)
+        private String activeTable;
+        private String personnelInfoTable;
+        private String labelTable;
     }
 }

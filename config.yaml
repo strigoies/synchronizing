@@ -1,9 +1,9 @@
 kafka:
   hosts: 192.168.11.12:9092,192.168.11.13:9092,192.168.11.14:9092
   # debezium监控mongo对应topic的数据
-  faceProfileTopic: mongo-shard.yisa_oe.face_group
+  faceProfileTopic: mongo-shard-test1.yisa_oe.face_group_test
   faceProfilePlateTopic: mongo-shard.yisa_oe.face_group_plate
-  groupId: face-profile-synchronizing-20221206
+  groupId: face-profile-synchronizing-20221219
   # 偏移量策略,earliest,latest
   # (同一组id，第一次启动为earliest，后面设置为latest)
   offset: latest
@@ -28,6 +28,23 @@ lightningDB:
   flushInterval: 1000
   # 最大重试次数
   maxRetries: 3
+
+arangoDB:
+  hosts:
+    - ['192.168.11.13', 8529]
+  username: 'root'
+  password: 'yisa123456'
+  database: 'yisa_personnel'
+  # 关系表（边表）
+  relationEdgeTable: personnel_relation
+  # 驾乘人脸聚类档案表
+  faceProfilePlateTable: face_profile_plate
+  # 人脸聚类档案表
+  faceProfileTable: face_profile
+  # 人员基本信息
+  personnelInfoTable: personnel_info
+  #  标签表
+  labelTable: label_info
 
 parameter:
   # 检查点间隔时间(毫秒)

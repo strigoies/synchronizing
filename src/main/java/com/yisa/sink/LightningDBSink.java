@@ -1,6 +1,5 @@
 package com.yisa.sink;
 
-import com.yisa.model.BaseData;
 import com.yisa.model.FaceProfile;
 import com.yisa.utils.ConfigEntity;
 import com.yisa.utils.StringUtils;
@@ -31,7 +30,7 @@ public class LightningDBSink {
      * @param lightningDB
      * @return
      */
-    public static SinkFunction<BaseData> insertFaceProfileSinkFunction(ConfigEntity.LightningDB lightningDB) {
+    public static SinkFunction<FaceProfile> insertFaceProfileSinkFunction(ConfigEntity.LightningDB lightningDB) {
         String insertSql = String.format(faceProfileInsertSql, lightningDB.getActiveTable());
         // 随机获取一个节点
         List<List> lightningDBHostPorts = lightningDB.getHosts();

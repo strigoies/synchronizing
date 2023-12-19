@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class FaceProfile extends BaseData {
+public class FaceProfile {
     @JSONField(name = "_id", deserialize = false)
     private long group;
     @JSONField(deserialize = false)
@@ -20,13 +20,13 @@ public class FaceProfile extends BaseData {
     private int faceCount;
     @JSONField(name = "person_count", defaultValue = "0")
     private int personCount;
-    @JSONField(name = "age_id",defaultValue = "0")
-    private short ageId;
 
     @JSONField(name = "personnel_name")
     private String personnelName;
     @JSONField(name = "personnel_id_number")
     private String personnelIdNumber;
+    @JSONField(name = "personnel_id_type")
+    private String personnelIdType;
     @JSONField(name = "personnel_photo_url")
     private String personnelPhotoUrl;
     @JSONField(name = "cosine_similarity", defaultValue = "0.0")
@@ -52,6 +52,8 @@ public class FaceProfile extends BaseData {
     private int birthday;
     @JSONField(defaultValue = "0")
     private short gender;
+    @JSONField(name = "age_id",defaultValue = "0")
+    private short ageId;
     // private int g_quality_int;
     @JSONField(name = "high_quality_id", deserialize = false)
     private byte[] highQualityId = new byte[0];

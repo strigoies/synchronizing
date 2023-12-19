@@ -1,7 +1,7 @@
 package com.yisa;
 
-import com.yisa.model.BaseData;
 import com.yisa.model.FaceProfile;
+import com.yisa.sink.ArangoDBSink;
 import com.yisa.sink.LightningDBSink;
 import com.yisa.source.KafkaSource;
 import com.yisa.utils.ConfigEntity;
@@ -9,6 +9,8 @@ import com.yisa.utils.ReadConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -26,20 +28,23 @@ public class FaceProfileSynchronizing {
         if (FACE_PROFILE_JOB.equals(config.getParameter().getJobName())) {
             config.getKafka().setActiveTopic(config.getKafka().getFaceProfileTopic());
             config.getLightningDB().setActiveTable(config.getLightningDB().getFaceProfileDistributedTable());
+            config.getArangoDB().setActiveTable(config.getArangoDB().getFaceProfileTable());
         } else if (FACE_PROFILE_PLATE_JOB.equals(config.getParameter().getJobName())) {
             config.getKafka().setActiveTopic(config.getKafka().getFaceProfilePlateTopic());
             config.getLightningDB().setActiveTable(config.getLightningDB().getFaceProfilePlateDistributedTable());
+            config.getArangoDB().setActiveTable(config.getArangoDB().getFaceProfilePlateTable());
         } else {
             log.error("选择了错误的任务去运行!!!");
             throw new Exception("No change of task");
         }
 
-        /*本地环境调试配置
+        //本地环境调试配置
         Configuration conf = new Configuration();
         conf.setString(RestOptions.BIND_PORT, "8081-8099");
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
-         */
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+
+//        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 开启checkpoint
         env.enableCheckpointing(config.getParameter().getCheckPoint());
         // 设置两次 checkpoint 之间的最小时间间隔
@@ -53,16 +58,22 @@ public class FaceProfileSynchronizing {
         }
 
         // 获取kafka数据
-        SingleOutputStreamOperator<BaseData> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
+        SingleOutputStreamOperator<FaceProfile> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
                 .name("get data source");
 
         // 数据写入 clickhouse
-        outputStream.keyBy((KeySelector<BaseData, Long>) value -> {
-            FaceProfile val = (FaceProfile)value;
-            return val.getGroup();
-        })
-                .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
-                .name("insert into clickhouse");
+//        outputStream.keyBy((KeySelector<FaceProfile, Long>) value -> {
+//            FaceProfile val = (FaceProfile)value;
+//            return val.getGroup();
+//        })
+//                .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
+//                .name("insert into clickhouse");
+
+
+        // 数据写入ArangoDB
+        outputStream.addSink(new ArangoDBSink(config.getArangoDB()))
+                .name("insert into ArangoDB")
+                .setParallelism(1);
 
         env.execute(config.getParameter().getJobName());
     }
