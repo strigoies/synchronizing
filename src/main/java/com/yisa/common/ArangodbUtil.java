@@ -39,6 +39,22 @@ public class ArangodbUtil {
     }
 
     /**
+     * 向arangodb插入文档或边缘, 通过对象的方式传入参数
+     * @param collection
+     * @param b
+     */
+    public static void insertDocumentFromBaseDocument(ArangoCollection collection, BaseDocument b) {
+        try {
+            DocumentCreateEntity<String> resp = collection.insertDocument(JSON.toJSONString(b));
+            log.info("ArangoDB insert document success! id: {}, key: {}", resp.getId(), resp.getKey());
+        } catch (ArangoDBException e) {
+            log.error("ArangoDB insert document error! err code: {}, http code: {}, {}",
+                    e.getErrorNum(), e.getResponseCode(), e.getErrorMessage());
+            log.debug("debug info: {}", b.toString());
+        }
+    }
+
+    /**
      * 更新arangodb文档, 通过base document方式
      * @param collection
      * @param bd

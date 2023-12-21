@@ -1,5 +1,6 @@
 package com.yisa;
 
+import com.yisa.model.ArangoDBMark;
 import com.yisa.model.FaceProfile;
 import com.yisa.sink.ArangoDBSink;
 import com.yisa.sink.LightningDBSink;
@@ -58,7 +59,7 @@ public class FaceProfileSynchronizing {
         }
 
         // 获取kafka数据
-        SingleOutputStreamOperator<FaceProfile> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
+        SingleOutputStreamOperator<ArangoDBMark> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
                 .name("get data source");
 
         // 数据写入 clickhouse

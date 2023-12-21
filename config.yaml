@@ -1,7 +1,7 @@
 kafka:
   hosts: 192.168.11.12:9092,192.168.11.13:9092,192.168.11.14:9092
   # debezium监控mongo对应topic的数据
-  faceProfileTopic: mongo-shard-test1.yisa_oe.face_group_test
+  faceProfileTopic: mongo-shard-test3.yisa_oe.face_group_test
   faceProfilePlateTopic: mongo-shard.yisa_oe.face_group_plate
   groupId: face-profile-synchronizing-20221219
   # 偏移量策略,earliest,latest

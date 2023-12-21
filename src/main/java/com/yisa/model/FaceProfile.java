@@ -14,7 +14,7 @@ public class FaceProfile {
 
     @JSONField(name = "new_id", deserialize = false)
     private byte[] newId = new byte[0];
-    @JSONField(name = "grout_count", defaultValue = "0")
+    @JSONField(alternateNames = {"g_count", "group_count"}, defaultValue = "0")
     private int groupCount;
     @JSONField(name = "face_count", defaultValue = "0")
     private int faceCount;
@@ -22,13 +22,13 @@ public class FaceProfile {
     private int personCount;
 
     @JSONField(name = "personnel_name")
-    private String personnelName;
+    private String personnelName = "";
     @JSONField(name = "personnel_id_number")
-    private String personnelIdNumber;
+    private String personnelIdNumber = "";
     @JSONField(name = "personnel_id_type")
-    private String personnelIdType;
+    private String personnelIdType = "";
     @JSONField(name = "personnel_photo_url")
-    private String personnelPhotoUrl;
+    private String personnelPhotoUrl = "";
     @JSONField(name = "cosine_similarity", defaultValue = "0.0")
     private float cosineSimilarity;
     @JSONField(name = "associated_time", defaultValue = "0")
@@ -46,7 +46,7 @@ public class FaceProfile {
     @JSONField(name = "household_code", defaultValue = "0")
     private int householdCode;
     @JSONField(name = "household_address")
-    private String householdAddress;
+    private String householdAddress = "";
 
     @JSONField(defaultValue = "0")
     private int birthday;

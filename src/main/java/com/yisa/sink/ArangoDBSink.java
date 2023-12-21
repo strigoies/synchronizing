@@ -1,6 +1,7 @@
 package com.yisa.sink;
 
 import com.arangodb.*;
+import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionType;
 import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.util.MapBuilder;
@@ -19,7 +20,7 @@ import java.util.*;
 import static com.yisa.common.ArangodbUtil.*;
 
 @Slf4j
-public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
+public class ArangoDBSink extends RichSinkFunction<ArangoDBMark> {
 
     private static final int LABEL_RELATION_TYPE = 101;
 
@@ -84,12 +85,20 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
     }
 
     @Override
-    public void invoke(FaceProfile faceProfile, Context context) throws Exception {
-        ArangoDBMark arangoDBMark = (ArangoDBMark) faceProfile;
+    public void invoke(ArangoDBMark arangoDBMark, Context context) throws Exception {
+        log.warn("arangoDBMark内容:{}",arangoDBMark.toString());
+        FaceProfile faceProfile = arangoDBMark.getFaceProfile();
         Integer[] beforeLabels = arangoDBMark.getBeforeLabels();
-        Integer[] afterLabels = arangoDBMark.getAfterLabels();
-        if (beforeLabels.length == 0 && afterLabels.length == 0) return;
-        String op = arangoDBMark.getOp();
+        Integer[]  afterLabels = arangoDBMark.getAfterLabels();
+
+        String beforePersonnelIdType = arangoDBMark.getBeforePersonnelIdType();
+        String beforePersonnelIdNumber = arangoDBMark.getBeforePersonnelIdNumber();
+        String afterPersonnelIdType = arangoDBMark.getAfterPersonnelIdType();
+        String afterPersonnelIdNumber = arangoDBMark.getAfterPersonnelIdNumber();
+
+        // 聚类在ArangoDB的顶点格式
+        String faceProfileFrom = String.format("%s/%s", activeTable.name(), arangoDBMark.getGroup());
+
         // 明确当前流插入的是人脸聚类还是驾乘人脸聚类
         int personnelRelationType ;
         String personnelRelationName;
@@ -101,60 +110,93 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
             personnelRelationName = "人和驾乘人脸聚类的关系";
         }
 
-        // 写入Arangodb
-        Integer[] lbs = arangoDBMark.getLabels();
-        String faceProfileFrom = String.format("%s/%s", activeTable.name(), arangoDBMark.getGroup());
+        // 先处理人员档案
+        if (!beforePersonnelIdNumber.isEmpty() && !beforePersonnelIdType.isEmpty()
+                && afterPersonnelIdNumber.isEmpty() && afterPersonnelIdType.isEmpty()){
+            log.warn("删除人员档案");
+            // 删除实名人和人员基本信息关系
+            Relation relationPerson = new Relation();
+            relationPerson.set_from(faceProfileFrom);
+            relationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(), beforePersonnelIdType, beforePersonnelIdNumber));
+            relationPerson.setRelation_type(personnelRelationType);
+            relationPerson.setRelation_name(personnelRelationName);
+            relationDelete(relationPerson);
+        }else if((beforePersonnelIdNumber.isEmpty() && beforePersonnelIdType.isEmpty())
+                && !afterPersonnelIdNumber.isEmpty() && !afterPersonnelIdType.isEmpty()){
+            // 新建人和人员基本信息关系
+            log.warn("新建人员档案");
+            Relation relationPerson = new Relation();
+            relationPerson.set_from(faceProfileFrom);
+            relationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(), afterPersonnelIdType, afterPersonnelIdNumber));
+            relationPerson.setRelation_type(personnelRelationType);
+            relationPerson.setRelation_name(personnelRelationName);
+            relationInsert(relationPerson);
+        }else if (!beforePersonnelIdNumber.isEmpty() && !beforePersonnelIdType.isEmpty()
+                && !afterPersonnelIdNumber.isEmpty() && !afterPersonnelIdType.isEmpty()
+                && !beforePersonnelIdNumber.equals(afterPersonnelIdNumber)){
+            // 更新实名人和人员基本信息关系
+            log.warn("更新人员档案");
+            Relation beforeRelationPerson = new Relation();
+            beforeRelationPerson.set_from(faceProfileFrom);
+            beforeRelationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(), beforePersonnelIdType, beforePersonnelIdNumber));
+            beforeRelationPerson.setRelation_type(personnelRelationType);
+            beforeRelationPerson.setRelation_name(personnelRelationName);
+            relationDelete(beforeRelationPerson);
+
+            Relation AfterRelationPerson = new Relation();
+            AfterRelationPerson.set_from(faceProfileFrom);
+            AfterRelationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(), afterPersonnelIdType, afterPersonnelIdNumber));
+            AfterRelationPerson.setRelation_type(personnelRelationType);
+            AfterRelationPerson.setRelation_name(personnelRelationName);
+            relationInsert(AfterRelationPerson);
+        }
+
+        // 判断标签
+        if (beforeLabels.length == 0 && afterLabels.length == 0 ) {
+            log.warn("无标签");
+            return;
+        }
+
+        // 根据更新方法操作ArangoDB
+        String op = arangoDBMark.getOp();
         switch (op){
             case "c":
+                log.warn("Execute create process");
+                // 聚类档案写入ArangoDB
+                activeTable.insertDocument(formatArangoDB(faceProfile));
                 // 建聚类档案和标签关系
                 Relation relation = new Relation();
                 relation.set_from(faceProfileFrom);
                 relation.setRelation_type(LABEL_RELATION_TYPE);
                 relation.setRelation_name(LABEL_RELATION_NAME);
-                for (Integer lb : lbs) {
-                    relation.set_to(String.format("%s/%d-1", relationEdgeCollection.name(), lb));
-                    //TODO:决定使用哪种方式进行建边
-//                    insertDocumentFromObject(relationEdgeCollection,relation);//不判断边连接的点是否存在
+                for (Integer lb : afterLabels) {
+                    relation.set_to(String.format("%s/%d-1", labelTable.name(), lb));
                     relationInsert(relation);//确定两边的点都存在进行建边
                 }
-                // 实名人员建立和人员基本信息关系
-                if (arangoDBMark.getPersonnelIdType() != null && arangoDBMark.getPersonnelIdNumber() != null){
-                    Relation relationPerson = new Relation();
-                    relationPerson.set_from(faceProfileFrom);
-                    relationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(),arangoDBMark.getPersonnelIdType(),arangoDBMark.getPersonnelIdNumber()));
-                    relationPerson.setRelation_type(personnelRelationType);
-                    relationPerson.setRelation_name(personnelRelationName);
-                    relationInsert(relationPerson);
-                }
-
-                // 聚类档案写入ArangoDB
-                insertDocumentFromObject(activeTable,faceProfile);
-
+                break;
             case "u":
-                String idNumber =  arangoDBMark.getPersonnelIdNumber();
-                // 更新身份证号-实名处理
-                if (!idNumber.isEmpty()){
-                    // 建立人员信息和聚类关系
-                    Relation relationPerson1 = new Relation();
-                    relationPerson1.set_from(faceProfileFrom);
-                    relationPerson1.set_to(String.format("%s/%s-%s",personnelInfoTable.name(),arangoDBMark.getPersonnelIdType(),arangoDBMark.getPersonnelIdNumber()));
-                    relationPerson1.setRelation_type(personnelRelationType);
-                    relationPerson1.setRelation_name(personnelRelationName);
-                    relationInsert(relationPerson1);
-
-                    // 补全档案信息
-                    insertDocumentFromObject(activeTable,faceProfile);
+                log.warn("Execute update process");
+                // 聚类第一次被打标签(因ArangoDB不入全量数据，所以第一次打标签时才在ArangoBD中创建聚类)
+                if (beforeLabels.length == 0){
+                    // 聚类档案写入ArangoDB
+                    activeTable.insertDocument(formatArangoDB(faceProfile));
+                    // 建聚类档案和标签关系
+                    Relation relationFirsts = new Relation();
+                    relationFirsts.set_from(faceProfileFrom);
+                    relationFirsts.setRelation_type(LABEL_RELATION_TYPE);
+                    relationFirsts.setRelation_name(LABEL_RELATION_NAME);
+                    for (Integer lb : afterLabels) {
+                        relationFirsts.set_to(String.format("%s/%d-1", labelTable.name(), lb));
+                        relationInsert(relationFirsts);
+                    }
+                    return;
                 }
 
                 // 更新标签-建立关系
                 ArrayChangesResult<Integer> integerArrayChangesResult = labelsModified(beforeLabels, afterLabels);
-                // 未更新标签
-                if (integerArrayChangesResult.added == null && integerArrayChangesResult.removed == null){
-                    insertDocumentFromObject(activeTable,faceProfileFrom);
-                    return;
-                }
                 // 新增标签关系
-                if (integerArrayChangesResult.added != null){
+                if (integerArrayChangesResult.added != null && !integerArrayChangesResult.added.isEmpty()){
+                    log.warn("Add labels");
                     for(Integer lb: integerArrayChangesResult.added){
                         Relation relationLabel = new Relation();
                         relationLabel.set_from(faceProfileFrom);
@@ -163,10 +205,10 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
                         relationLabel.setRelation_type(LABEL_RELATION_TYPE);
                         relationInsert(relationLabel);
                     }
-                    insertDocumentFromObject(activeTable,faceProfile);
                 }
                 // 删除标签关系
-                if (integerArrayChangesResult.removed != null){
+                if (integerArrayChangesResult.removed != null && !integerArrayChangesResult.removed.isEmpty()){
+                    log.warn("Remove labels");
                     for(Integer lb : integerArrayChangesResult.removed){
                         Relation relationLabel = new Relation();
                         relationLabel.set_from(faceProfileFrom);
@@ -176,23 +218,23 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
                         relationDelete(relationLabel);
                     }
                 }
-
                 // 其他更新-更新档案表
-                insertDocumentFromObject(activeTable,faceProfile);
+                updateDocumentFromBase(activeTable,formatArangoDB(faceProfile));
+                break;
 
             case "d":
-                // 删除所有边
-                String aql = "LET relations = (FOR r IN" + relationEdgeCollection.name() +
-                        "FILTER r._form == @from RETURN r._key)" +
-                        "FOR relation IN relations REMOVE {_key:relation} in" + relationEdgeCollection.name();
+                log.warn("Execute remove process");
+                String aql = "LET relations = (FOR r IN " + relationEdgeCollection.name() +
+                        " FILTER r._from == @from RETURN r._key)" +
+                        " FOR relation IN relations REMOVE {_key:relation} in " + relationEdgeCollection.name();
                 Map<String,Object> params = new MapBuilder()
                         .put("from",faceProfileFrom)
                         .get();
-                List<String> result = queryArangoAsString(arangoDatabase, aql, params);
-                log.info("删除关系边成功："+result.toString());
+                queryArangoAsString(arangoDatabase, aql, params);
+                log.warn("Delete profile success");
 
-                //
-                deleteDocument(activeTable,faceProfileFrom);
+                deleteDocument(activeTable,String.valueOf(arangoDBMark.getGroup()));
+                break;
         }
 
     }
@@ -239,9 +281,9 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
     }
 
     public void relationDelete(Relation relation) {
-        String aql = "LET relations = (FOR r IN" + relationEdgeCollection.name() +
-                "FILTER r._form == @from AND r._to == @to RETURN r._key)" +
-                "FOR relation IN relations REMOVE {_key:relation} in" + relationEdgeCollection.name();
+        String aql = "LET relations = (FOR r IN " + relationEdgeCollection.name() +
+                " FILTER r._from == @from AND r._to == @to RETURN r._key)" +
+                " FOR relation IN relations REMOVE {_key:relation} in " + relationEdgeCollection.name();
         Map<String,Object> params = new MapBuilder()
                 .put("from",relation.get_from())
                 .put("to",relation.get_to())
@@ -251,7 +293,7 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
     }
 
     // 比较前后数组变化
-    private static <Integer> ArrayChangesResult<Integer> labelsModified(Integer[] beforeLabels, Integer[] afterLabels){
+    private static ArrayChangesResult<Integer> labelsModified(Integer[] beforeLabels, Integer[] afterLabels){
         List<Integer> added = new ArrayList<>();
         List<Integer> removed = new ArrayList<>();
 
@@ -287,5 +329,33 @@ public class ArangoDBSink extends RichSinkFunction<FaceProfile> {
             this.removed = removed;
         }
 
+    }
+
+    private static BaseDocument formatArangoDB(FaceProfile faceProfile){
+        BaseDocument baseDocument = new BaseDocument();
+        baseDocument.setKey(String.valueOf(faceProfile.getGroup()));
+        baseDocument.addAttribute("group",faceProfile.getGroup());
+        baseDocument.addAttribute("center",faceProfile.getCenter());
+        baseDocument.addAttribute("new_id",faceProfile.getNewId());
+        baseDocument.addAttribute("group_count",faceProfile.getGroupCount());
+        baseDocument.addAttribute("face_count",faceProfile.getFaceCount());
+        baseDocument.addAttribute("person_count",faceProfile.getPersonCount());
+        baseDocument.addAttribute("personnel_photo_url",faceProfile.getPersonnelPhotoUrl());
+        baseDocument.addAttribute("personnel_id_number",faceProfile.getPersonnelIdNumber());
+        baseDocument.addAttribute("personnel_id_type",faceProfile.getPersonnelIdType());
+        baseDocument.addAttribute("personnel_name",faceProfile.getPersonnelName());
+        baseDocument.addAttribute("cosine_similarity",faceProfile.getCosineSimilarity());
+        baseDocument.addAttribute("associated_time",faceProfile.getAssociatedTime());
+        baseDocument.addAttribute("insert_time",faceProfile.getInsertTime());
+        baseDocument.addAttribute("update_time",faceProfile.getInsertTime());
+        baseDocument.addAttribute("device_object_types",faceProfile.getSourceTypes());
+        baseDocument.addAttribute("centers",faceProfile.getCenters());
+        baseDocument.addAttribute("household_code",faceProfile.getHouseholdCode());
+        baseDocument.addAttribute("household_address",faceProfile.getHouseholdAddress());
+        baseDocument.addAttribute("birthday",faceProfile.getBirthday());
+        baseDocument.addAttribute("age_id",faceProfile.getAgeId());
+        baseDocument.addAttribute("gender",faceProfile.getGender());
+        baseDocument.addAttribute("high_quality_id",faceProfile.getHighQualityId());
+        return baseDocument;
     }
 }
