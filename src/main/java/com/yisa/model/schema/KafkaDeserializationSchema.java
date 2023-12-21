@@ -87,7 +87,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
             if (payload.containsKey(KEY_UPDATE_DESCRIPTION) && payload.getJSONObject(KEY_UPDATE_DESCRIPTION) != null){
                 // 处理存在字段更新
                 JSONObject udpateJsonObject = payload.getJSONObject(KEY_UPDATE_DESCRIPTION).getJSONObject("updatedFields");
-//                JSONObject removeJsonObject = payload.getJSONObject(KEY_UPDATE_DESCRIPTION).getJSONObject("removedFields");
                 JSONArray removeJsonObject = payload.getJSONObject(KEY_UPDATE_DESCRIPTION).getJSONArray("removedFields");
                 // 更新字段
                 if (udpateJsonObject != null && ((udpateJsonObject.containsKey("personnel_id_number") || udpateJsonObject.containsKey("personnel_id_type")))){
@@ -110,7 +109,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
                 }
                 // 删除字段
                 if(removeJsonObject != null && (removeJsonObject.contains("personnel_id_number") || removeJsonObject.contains("personnel_id_type"))){
-                    log.warn("删除字段记录");
                     arangoDBMark.setBeforePersonnelIdNumber(beforePersonnelIdNumber);
                     arangoDBMark.setBeforePersonnelIdType(beforePersonnelIdType);
                     String personnelIdNumber = JSON.parseObject(beforeJsonObject.getString("personnel_id_number"),String.class);
@@ -148,8 +146,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
 
     /**
      * 解析 long 类型字段
-     * @param faceProfile
-     * @param after
      */
     private void parseLongData(FaceProfile faceProfile, JSONObject after) {
         if (after == null) {
@@ -164,23 +160,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         if (after.containsKey("associated_time")) {
             faceProfile.setAssociatedTime(after.getJSONObject("associated_time").getInteger("$numberLong"));
         }
-    }
-
-    private void handleDeletedData(byte[] key, Collector<ArangoDBMark> collector) {
-        // 设置ArangoDB
-        ArangoDBMark arangoDBMark = new ArangoDBMark();
-        arangoDBMark.setOp("d");
-        arangoDBMark.setGroup(JSON.parseObject(key).getJSONObject("payload").getLong("id"));
-
-        FaceProfile faceProfile = FaceProfile.create();
-        faceProfile.setIsDeleted((byte) 1);
-        faceProfile.setGroup(arangoDBMark.getGroup());
-        // 黑名单 数据不进行同步
-        if (faceProfile.getBlackList() == 1) {
-            log.info(String.format("检测到黑名单数据, group: %d", faceProfile.getGroup()));
-        }
-        log.warn("删除的faceProfile为:{}",faceProfile);
-        collector.collect(arangoDBMark);
     }
 
     private void handleCommonSchemaTransform(JSONObject afterObject, FaceProfile faceProfile) {
