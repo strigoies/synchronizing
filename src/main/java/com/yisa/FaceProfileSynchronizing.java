@@ -8,10 +8,12 @@ import com.yisa.source.KafkaSource;
 import com.yisa.utils.ConfigEntity;
 import com.yisa.utils.ReadConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -62,13 +64,16 @@ public class FaceProfileSynchronizing {
         SingleOutputStreamOperator<ArangoDBMark> outputStream = KafkaSource.getKafkaStream(env, config.getKafka())
                 .name("get data source");
 
+        DataStream<FaceProfile> filteredStream = outputStream
+                .map((MapFunction<ArangoDBMark, FaceProfile>) ArangoDBMark::getFaceProfile);
+
         // 数据写入 clickhouse
-//        outputStream.keyBy((KeySelector<FaceProfile, Long>) value -> {
-//            FaceProfile val = (FaceProfile)value;
-//            return val.getGroup();
-//        })
-//                .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
-//                .name("insert into clickhouse");
+        filteredStream.keyBy((KeySelector<FaceProfile, Long>) value -> {
+            FaceProfile val = (FaceProfile)value;
+            return val.getGroup();
+        })
+                .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
+                .name("insert into clickhouse");
 
 
         // 数据写入ArangoDB
