@@ -42,12 +42,11 @@ public class FaceProfileSynchronizing {
         }
 
         //本地环境调试配置
-        Configuration conf = new Configuration();
-        conf.setString(RestOptions.BIND_PORT, "8081-8099");
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+//        Configuration conf = new Configuration();
+//        conf.setString(RestOptions.BIND_PORT, "8081-8099");
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
 
-
-//        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // 开启checkpoint
         env.enableCheckpointing(config.getParameter().getCheckPoint());
         // 设置两次 checkpoint 之间的最小时间间隔
@@ -69,8 +68,7 @@ public class FaceProfileSynchronizing {
 
         // 数据写入 clickhouse
         filteredStream.keyBy((KeySelector<FaceProfile, Long>) value -> {
-            FaceProfile val = (FaceProfile)value;
-            return val.getGroup();
+                    return ((FaceProfile)value).getGroup();
         })
                 .addSink(LightningDBSink.insertFaceProfileSinkFunction(config.getLightningDB()))
                 .name("insert into clickhouse");

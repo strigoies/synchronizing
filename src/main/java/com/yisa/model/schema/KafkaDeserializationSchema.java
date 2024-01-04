@@ -54,6 +54,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
             if (faceProfile.getBlackList() == 1) {
                 log.info(String.format("检测到黑名单数据, group: %d", faceProfile.getGroup()));
             }
+            arangoDBMark.setFaceProfile(faceProfile);
             collector.collect(arangoDBMark);
             return;
         }
@@ -76,10 +77,12 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         arangoDBMark.setGroup(group);
         arangoDBMark.setFaceProfile(faceProfile);
         if ("u".equals(op)){
-            FaceProfile faceProfileBefore = JSON.parseObject(payload.getString(KEY_AFTER), FaceProfile.class);
+            FaceProfile faceProfileBefore = JSON.parseObject(payload.getString(KEY_BEFORE), FaceProfile.class);
             JSONObject beforeJsonObject = payload.getJSONObject(KEY_BEFORE);
             String beforePersonnelIdNumber = JSON.parseObject(beforeJsonObject.getString("personnel_id_number"),String.class);
             String beforePersonnelIdType = JSON.parseObject(beforeJsonObject.getString("personnel_id_type"),String.class);
+            arangoDBMark.setBeforePersonnelIdNumber(beforePersonnelIdNumber);
+            arangoDBMark.setBeforePersonnelIdType(beforePersonnelIdType);
             beforeLabels = JSON.parseObject(beforeJsonObject.getString("labels"), Integer[].class);
             if (beforeLabels != null) arangoDBMark.setBeforeLabels(beforeLabels);
 
@@ -92,8 +95,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
                 if (udpateJsonObject != null && ((udpateJsonObject.containsKey("personnel_id_number") || udpateJsonObject.containsKey("personnel_id_type")))){
                     String personnelIdNumber = JSON.parseObject(udpateJsonObject.getString("personnel_id_number"),String.class);
                     String personnelIdType = JSONObject.parseObject(udpateJsonObject.getString("personnel_id_type"),String.class);
-                    arangoDBMark.setBeforePersonnelIdNumber(beforePersonnelIdNumber);
-                    arangoDBMark.setBeforePersonnelIdType(beforePersonnelIdType);
                     if (personnelIdNumber != null){
                         arangoDBMark.setAfterPersonnelIdNumber(personnelIdNumber);
                     }else {
@@ -109,8 +110,6 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
                 }
                 // 删除字段
                 if(removeJsonObject != null && (removeJsonObject.contains("personnel_id_number") || removeJsonObject.contains("personnel_id_type"))){
-                    arangoDBMark.setBeforePersonnelIdNumber(beforePersonnelIdNumber);
-                    arangoDBMark.setBeforePersonnelIdType(beforePersonnelIdType);
                     String personnelIdNumber = JSON.parseObject(beforeJsonObject.getString("personnel_id_number"),String.class);
                     String personnelIdType = JSONObject.parseObject(beforeJsonObject.getString("personnel_id_type"),String.class);
                     if (personnelIdNumber != null && personnelIdType == null){
@@ -135,6 +134,7 @@ public class KafkaDeserializationSchema implements KafkaRecordDeserializationSch
         }else if("c".equals(op)){
             arangoDBMark.setAfterPersonnelIdNumber(faceProfile.getPersonnelIdNumber());
             arangoDBMark.setAfterPersonnelIdType(faceProfile.getPersonnelIdType());
+            arangoDBMark.setAfterLabels(faceProfile.getLabels());
         }
         collector.collect(arangoDBMark);
     }

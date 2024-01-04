@@ -19,7 +19,7 @@ lightningDB:
   # 数据库
   database: yisa_oe
   # 档案分布式表
-  faceProfileDistributedTable: face_profile_insert_all
+  faceProfileDistributedTable: face_profile_insert_test_all
   # 驾乘档案分布式表
   faceProfilePlateDistributedTable: face_profile_plate_insert_all
   # 每一批最大插入的数据量
@@ -31,9 +31,9 @@ lightningDB:
 
 arangoDB:
   hosts:
-    - ['192.168.11.13', 8529]
+    - ['192.168.11.12', 8529]
   username: 'root'
-  password: 'yisa123456'
+  password: 'arango.root'
   database: 'yisa_personnel'
   # 关系表（边表）
   relationEdgeTable: personnel_relation

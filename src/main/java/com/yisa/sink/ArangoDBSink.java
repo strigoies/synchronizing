@@ -119,10 +119,12 @@ public class ArangoDBSink extends RichSinkFunction<ArangoDBMark> {
                 relationPerson.setRelation_type(personnelRelationType);
                 relationPerson.setRelation_name(personnelRelationName);
                 relationDelete(relationPerson);
-            }else if((beforePersonnelIdNumber.isEmpty() && beforePersonnelIdType.isEmpty())
+            }else if(beforePersonnelIdNumber.isEmpty() && beforePersonnelIdType.isEmpty()
                     && !afterPersonnelIdNumber.isEmpty() && !afterPersonnelIdType.isEmpty()){
                 // 新建人和人员基本信息关系
                 log.info("Create profile");
+                // 聚类档案写入ArangoDB
+                activeTable.insertDocument(formatArangoDB(faceProfile));
                 Relation relationPerson = new Relation();
                 relationPerson.set_from(faceProfileFrom);
                 relationPerson.set_to(String.format("%s/%s-%s",personnelInfoTable.name(), afterPersonnelIdType, afterPersonnelIdNumber));
@@ -165,8 +167,6 @@ public class ArangoDBSink extends RichSinkFunction<ArangoDBMark> {
             switch (op){
                 case "c":
                     log.info("Execute create process");
-                    // 聚类档案写入ArangoDB
-                    activeTable.insertDocument(formatArangoDB(faceProfile));
                     // 建聚类档案和标签关系
                     Relation relation = new Relation();
                     relation.set_from(faceProfileFrom);
@@ -179,8 +179,8 @@ public class ArangoDBSink extends RichSinkFunction<ArangoDBMark> {
                     break;
                 case "u":
                     log.info("Execute update process");
-                    // 聚类第一次被打标签(因ArangoDB不入全量数据，所以第一次打标签时才在ArangoBD中创建聚类)
-                    if (beforeLabels.length == 0){
+                    // 未实名聚类第一次被打标签(因ArangoDB不入全量数据，所以第一次打标签时才在ArangoBD中创建聚类)
+                    if (beforeLabels.length == 0 && afterPersonnelIdType.isEmpty() && afterPersonnelIdNumber.isEmpty()){
                         // 聚类档案写入ArangoDB
                         activeTable.insertDocument(formatArangoDB(faceProfile));
                         // 建聚类档案和标签关系
