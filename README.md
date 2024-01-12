@@ -1,6 +1,6 @@
 # 人脸档案同步项目
 ## 项目简介
-  此程序同步mongo的face_group和face_group_plate 集合到clickhouse的face_profile和face_profile_plate表。
+  此程序同步mongo的face_group和face_group_plate 集合到clickhouse和ArangoDB的face_profile和face_profile_plate表。
 
 ## 程序简介
 1. 使用`debazium`监控mongo数据变化同步到kafka, 消费kafka数据同步到雷霆对应表。
