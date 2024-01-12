@@ -3,7 +3,7 @@
   此程序同步mongo的face_group和face_group_plate 集合到clickhouse和ArangoDB的face_profile和face_profile_plate表。
 
 ## 程序简介
-1. 使用`debazium`监控mongo数据变化同步到kafka, 消费kafka数据同步到雷霆对应表。
+1. 使用`debazium`监控mongo数据变化同步到kafka, 消费kafka数据同步到Clickhouse和ArangoDB对应表。
 2. Sink 使用 jdbc `com.clickhouse`
 
 
